@@ -7,20 +7,20 @@ class Vector {
     size_t capacity_ = 0;
     T* data_ = nullptr;
 
-void resize_capacity(size_t new_size) {
-    T* new_data_ = new T[new_size];
+    void resize_capacity(size_t new_size) {
+        T* new_data_ = new T[new_size];
 
-    std::cerr << new_size << std::endl;
+        std::cerr << new_size << std::endl;
 
-    for (int i = 0; i < size_; ++i) {
-        new_data_[i] = data_[i];
+        for (int i = 0; i < size_; ++i) {
+            new_data_[i] = data_[i];
+        }
+
+        delete[] data_;
+
+        data_ = new_data_;
+        capacity_ = new_size;
     }
-
-    delete[] data_;
-
-    data_ = new_data_;
-    capacity_ = new_size;
-}
 
 public:
     Vector(std::size_t size, const T& value) {
@@ -45,24 +45,62 @@ public:
         ++size_;
     }
 
-    T& operator[](std::size_t idx) {
+    T& operator[](std::size_t idx) const {
         return data_[idx];
     };
 
     size_t size() {
         return size_;
     }
+
+    struct Iterator {
+        size_t idx;
+        const Vector<T>& vec;
+
+        Iterator(const Vector<T>& vec, size_t idx) : vec(vec), idx(idx) {}
+        T& operator*() const {
+            return vec[idx];
+        }
+
+        T* operator->() const {
+            return &(vec[idx]);
+        }
+
+        Iterator& operator++() {
+            ++idx;
+            return *this;
+        }
+
+        bool operator==(const Iterator& other) const {
+            return idx == other.idx;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return !(*this == other);
+        }
+    };
+
+    Iterator begin() const { return Iterator(*this, 0); }
+    Iterator end() const { return Iterator(*this, size_); }
 };
 
 
 int main() {
-//    std::vector<int> vec;
-//    vec.resize(10);
     Vector<int> vec(10, 2);
-    vec.push_back(5);
-    for (int i = 0; i < vec.size(); ++i) {
-        std::cout << vec[i] << std::endl;
+
+    auto begin = vec.begin();
+    auto end = vec.end();
+
+    Vector<Student> st;
+    auto begin = st.begin();
+
+    begin->name();
+    (*(begin)).name();
+
+    for (auto& i : vec) {
+        std::cout << i << std::endl;
     }
+
 
     return 0;
 }
